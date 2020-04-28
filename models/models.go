@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/EDDYCJY/go-gin-example/pkg/setting"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
 )
 
@@ -11,7 +12,7 @@ var db *gorm.DB
 
 type Model struct {
 	ID int `gorm:"primary_key" json:"id"`
-	CreateOn int `json:"create_on"`
+	CreatedOn int `json:"created_on"`
 	ModifiedOn int `json:"modified_on"`
 }
 
@@ -34,7 +35,7 @@ func init(){
 	tablePrefix = sec.Key("TABLE_PREFIX").String()
 
 	//mysql的连接 "user:password@/dbname?charset=utf8&parseTime=True&loc=Local"
-	db,err=gorm.Open( dbType,fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf-8&parseTime=True&loc=local",
+	db,err=gorm.Open( dbType,fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		user,
 		password,
 		host,
@@ -49,7 +50,7 @@ func init(){
 		return tablePrefix+defaultTableName
 	}
 
-	// 全局禁用表名复数
+	// 全局禁用表名复数    不开启的话 自动创建的表名后面会加上s
 	db.SingularTable(true) // 如果设置为true,`User`的默认表名为`user`,使用`TableName`设置的表名不受影响
 
 	//详细日志 set log mode, `true` for detailed logs, `false` for no log, default, will only print error logs
