@@ -47,7 +47,35 @@ func GetArticleTotal(maps interface{})(count int){
 }
 
 func GetArticles(pageNum,pageSize int,maps interface{})(articles []Article){
-	db.Limit(pageSize).Offset(pageNum).Where(maps).Find(&articles)
-
+	db.Preload("Tag").Where(maps).Limit(pageSize).Offset(pageNum).Find(&articles)
 	return
+}
+
+func GetArticle(id int)(article Article){
+	db.Where("id=?",id).First(&article)
+	db.Model(&article).Related(&article.Tag)
+	return
+}
+
+func EditArticle(id int,data interface{})bool{
+	db.Model(&Article{}).Where("id=?",id).Update(data)
+	return  true
+}
+
+func AddArticle(data map[string]interface{})bool{
+	db.Create(&Article{
+		TagID: data["tag_id"].(int),
+		Title: data["title"].(string),
+		Desc: data["desc"].(string),
+		Content: data["content"].(string),
+		CreatedBy: data["created_by"].(string),
+		State: data["state"].(int),
+	})
+
+	return true
+}
+
+func DeleteArticle(id int)bool{
+	db.Where("id=?",id).Delete(&Article{})
+	return true
 }
